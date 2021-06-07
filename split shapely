@@ -1,0 +1,22 @@
+from shapely.ops import split
+from osgeo import ogr
+from shapely.geometry import shape
+import json
+from shapely.geometry import Polygon
+import geopandas
+
+polygon = Polygon([(4044554.4439070006, 7569517.354207003), (4044554.4439070006, 7389900.157706999), (4304640.144439005, 7569517.354207003), (4304640.144439005, 7389900.157706999)])
+
+
+file = ogr.Open("W:/Big_Project/__MAPS/!Current/_06_June_21/VB/atmo/openweather_temp/contour_shp/contour.shp")
+shape1 = file.GetLayer(0)
+feature = shape1.GetFeature(0)
+first = json.loads(feature.ExportToJson())
+print(type(first))
+shp_geom = shape(first['geometry']) # or shp_geom = shape(first) with PyShp)
+print(shp_geom)
+
+result = split(polygon, shp_geom)
+result.wkt
+geoserias = geopandas.GeoSeries([result])
+geoserias.to_file("W:/Big_Project/__MAPS/!Current/_06_June_21/VB/atmo/openweather_temp/result.geojson", driver='GeoJSON')
